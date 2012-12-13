@@ -190,6 +190,14 @@ class YAMLLoader(object):
                 if setting in obj:
                     setattr(env, setting, obj[setting])
 
+            if 'load_path' in obj:
+                load_path = obj['load_path']
+                if load_path:
+                    if isinstance(load_path, list):
+                        env.load_path.extend(load_path)
+                    else:
+                        env.append_path(load_path)
+
             # Treat the 'directory' option special, make it relative to the
             # path of the YAML file, if we know it.
             if filename and 'directory' in env.config:
