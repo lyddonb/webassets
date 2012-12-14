@@ -47,7 +47,7 @@ class TestYAML(object):
                     - contents:
                         reallynested.css
                     - lessfile3
-                
+
         """).load_bundles()
         assert len(bundles) == 4
         assert bundles['standard'].output == 'output.css'
@@ -139,6 +139,50 @@ class TestYAML(object):
         """, filename='/var/www/project/config/yaml').load_environment()
         # The directory is considered relative to the YAML file location.
         assert environment.directory == '/var/www/project/something'
+
+    def test_load_environment_load_path_with_no_arguments(self):
+        environment = self.loader("""
+        url: /foo
+        directory: ../something
+        load_path:
+        """, filename='/var/www/project/config/yaml').load_environment()
+        # The directory is considered relative to the YAML file location.
+        assert environment.directory == '/var/www/project/something'
+        assert environment.load_path == []
+
+    def test_load_environment_load_path_with_single_non_list_argument(self):
+        environment = self.loader("""
+        url: /foo
+        directory: ../something
+        load_path: assets
+        """, filename='/var/www/project/config/yaml').load_environment()
+        # The directory is considered relative to the YAML file location.
+        assert environment.directory == '/var/www/project/something'
+        assert environment.load_path == ['assets']
+
+    def test_load_environment_load_path_with_single_argument(self):
+        environment = self.loader("""
+        url: /foo
+        directory: ../something
+        load_path:
+         - assets
+        """, filename='/var/www/project/config/yaml').load_environment()
+        # The directory is considered relative to the YAML file location.
+        assert environment.directory == '/var/www/project/something'
+        assert environment.load_path == ['assets']
+
+    def test_load_environment_load_path_with_multiple_arguments(self):
+        environment = self.loader("""
+        url: /foo
+        directory: ../something
+        load_path:
+         - assets
+         - files
+         - css
+        """, filename='/var/www/project/config/yaml').load_environment()
+        # The directory is considered relative to the YAML file location.
+        assert environment.directory == '/var/www/project/something'
+        assert environment.load_path == ['assets', 'files', 'css']
 
     def test_load_extra_default(self):
         """[Regression] If no extra= is given, the value defaults to {}"""
